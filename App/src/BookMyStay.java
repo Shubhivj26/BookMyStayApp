@@ -12,6 +12,15 @@ public class BookMyStayApp {
             this.size = size;
             this.price = price;
         }
+
+        void display(String type, int available) {
+            System.out.println(type + " Room:");
+            System.out.println("Beds: " + beds);
+            System.out.println("Size: " + size + " sqft");
+            System.out.println("Price per night: " + price);
+            System.out.println("Available: " + available);
+            System.out.println();
+        }
     }
 
     static class SingleRoom extends Room {
@@ -43,20 +52,7 @@ public class BookMyStayApp {
         }
 
         int getAvailability(String roomType) {
-            return inventory.get(roomType);
-        }
-
-        void updateAvailability(String roomType, int count) {
-            inventory.put(roomType, count);
-        }
-
-        void displayInventory() {
-            System.out.println("Hotel Room Inventory");
-            System.out.println();
-
-            for (String type : inventory.keySet()) {
-                System.out.println(type + " Rooms Available: " + inventory.get(type));
-            }
+            return inventory.getOrDefault(roomType, 0);
         }
     }
 
@@ -64,6 +60,23 @@ public class BookMyStayApp {
 
         RoomInventory inventory = new RoomInventory();
 
-        inventory.displayInventory();
+        Room single = new SingleRoom();
+        Room doubleRoom = new DoubleRoom();
+        Room suite = new SuiteRoom();
+
+        System.out.println("Available Rooms");
+        System.out.println();
+
+        if (inventory.getAvailability("Single") > 0) {
+            single.display("Single", inventory.getAvailability("Single"));
+        }
+
+        if (inventory.getAvailability("Double") > 0) {
+            doubleRoom.display("Double", inventory.getAvailability("Double"));
+        }
+
+        if (inventory.getAvailability("Suite") > 0) {
+            suite.display("Suite", inventory.getAvailability("Suite"));
+        }
     }
 }
