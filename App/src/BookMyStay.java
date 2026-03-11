@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 public class BookMyStayApp {
 
     static abstract class Room {
@@ -9,15 +11,6 @@ public class BookMyStayApp {
             this.beds = beds;
             this.size = size;
             this.price = price;
-        }
-
-        void display(String type, int available) {
-            System.out.println(type + " Room:");
-            System.out.println("Beds: " + beds);
-            System.out.println("Size: " + size + " sqft");
-            System.out.println("Price per night: " + price);
-            System.out.println("Available: " + available);
-            System.out.println();
         }
     }
 
@@ -39,21 +32,38 @@ public class BookMyStayApp {
         }
     }
 
+    static class RoomInventory {
+
+        HashMap<String, Integer> inventory = new HashMap<>();
+
+        RoomInventory() {
+            inventory.put("Single", 5);
+            inventory.put("Double", 3);
+            inventory.put("Suite", 2);
+        }
+
+        int getAvailability(String roomType) {
+            return inventory.get(roomType);
+        }
+
+        void updateAvailability(String roomType, int count) {
+            inventory.put(roomType, count);
+        }
+
+        void displayInventory() {
+            System.out.println("Hotel Room Inventory");
+            System.out.println();
+
+            for (String type : inventory.keySet()) {
+                System.out.println(type + " Rooms Available: " + inventory.get(type));
+            }
+        }
+    }
+
     public static void main(String[] args) {
 
-        Room single = new SingleRoom();
-        Room doubleRoom = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        RoomInventory inventory = new RoomInventory();
 
-        int singleAvailable = 5;
-        int doubleAvailable = 3;
-        int suiteAvailable = 2;
-
-        System.out.println("Hotel Room Initialization");
-        System.out.println();
-
-        single.display("Single", singleAvailable);
-        doubleRoom.display("Double", doubleAvailable);
-        suite.display("Suite", suiteAvailable);
+        inventory.displayInventory();
     }
 }
