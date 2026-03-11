@@ -1,4 +1,4 @@
-import java.util.HashMap;
+import java.util.*;
 
 public class BookMyStayApp {
 
@@ -14,56 +14,46 @@ public class BookMyStayApp {
         }
     }
 
-    static class SingleRoom extends Room {
-        SingleRoom() {
-            super(1, 250, 1500.0);
+    static class Reservation {
+        String guestName;
+        String roomType;
+
+        Reservation(String guestName, String roomType) {
+            this.guestName = guestName;
+            this.roomType = roomType;
+        }
+
+        void display() {
+            System.out.println("Guest: " + guestName + " requested " + roomType + " room");
         }
     }
 
-    static class DoubleRoom extends Room {
-        DoubleRoom() {
-            super(2, 400, 2500.0);
-        }
-    }
+    static class BookingRequestQueue {
 
-    static class SuiteRoom extends Room {
-        SuiteRoom() {
-            super(3, 750, 5000.0);
-        }
-    }
+        Queue<Reservation> queue = new LinkedList<>();
 
-    static class RoomInventory {
-
-        HashMap<String, Integer> inventory = new HashMap<>();
-
-        RoomInventory() {
-            inventory.put("Single", 5);
-            inventory.put("Double", 3);
-            inventory.put("Suite", 2);
+        void addRequest(Reservation r) {
+            queue.offer(r);
         }
 
-        int getAvailability(String roomType) {
-            return inventory.get(roomType);
-        }
-
-        void updateAvailability(String roomType, int count) {
-            inventory.put(roomType, count);
-        }
-
-        void displayInventory() {
-            System.out.println("Hotel Room Inventory");
+        void displayRequests() {
+            System.out.println("Booking Requests in Queue:");
             System.out.println();
 
-            for (String type : inventory.keySet()) {
-                System.out.println(type + " Rooms Available: " + inventory.get(type));
+            for (Reservation r : queue) {
+                r.display();
             }
         }
     }
 
     public static void main(String[] args) {
 
-        RoomInventory inventory = new RoomInventory();
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        inventory.displayInventory();
+        bookingQueue.addRequest(new Reservation("Alice", "Single"));
+        bookingQueue.addRequest(new Reservation("Bob", "Double"));
+        bookingQueue.addRequest(new Reservation("Charlie", "Suite"));
+
+        bookingQueue.displayRequests();
     }
 }
