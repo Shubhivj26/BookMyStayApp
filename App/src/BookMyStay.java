@@ -1,110 +1,104 @@
 import java.util.*;
 
-public class BookMyStayApp {
+// Represents an individual add-on service
+class AddOnService {
+    private String serviceName;
+    private double cost;
 
-    static abstract class Room {
-        int beds;
-        int size;
-        double price;
-
-        Room(int beds, int size, double price) {
-            this.beds = beds;
-            this.size = size;
-            this.price = price;
-        }
+    public AddOnService(String serviceName, double cost) {
+        this.serviceName = serviceName;
+        this.cost = cost;
     }
 
-    static class Reservation {
-        String guestName;
-        String roomType;
-
-        Reservation(String guestName, String roomType) {
-            this.guestName = guestName;
-            this.roomType = roomType;
-        }
+    public String getServiceName() {
+        return serviceName;
     }
 
-    static class RoomInventory {
-
-        HashMap<String, Integer> inventory = new HashMap<>();
-
-        RoomInventory() {
-            inventory.put("Single", 5);
-            inventory.put("Double", 3);
-            inventory.put("Suite", 2);
-        }
-
-        int getAvailability(String roomType) {
-            return inventory.getOrDefault(roomType, 0);
-        }
-
-        void decrement(String roomType) {
-            inventory.put(roomType, inventory.get(roomType) - 1);
-        }
+    public double getCost() {
+        return cost;
     }
 
-    static class BookingQueue {
+    @Override
+    public String toString() {
+        return serviceName + " (₹" + cost + ")";
+    }
+}
 
-        Queue<Reservation> queue = new LinkedList<>();
+// Manages add-on services for reservations
+class AddOnServiceManager {
 
-        void addRequest(Reservation r) {
-            queue.offer(r);
-        }
+    // Map of Reservation ID -> List of Services
+    private Map<String, List<AddOnService>> reservationServicesMap;
 
-        Reservation getNext() {
-            return queue.poll();
-        }
-
-        boolean hasRequests() {
-            return !queue.isEmpty();
-        }
+    public AddOnServiceManager() {
+        reservationServicesMap = new HashMap<>();
     }
 
-    static class RoomAllocationService {
+    // Add service to a reservation
+    public void addService(String reservationId, AddOnService service) {
+        reservationServicesMap
+                .computeIfAbsent(reservationId, k -> new ArrayList<>())
+                .add(service);
+    }
 
-        HashMap<String, Set<String>> allocatedRooms = new HashMap<>();
-        Set<String> usedRoomIds = new HashSet<>();
+    // Get services for a reservation
+    public List<AddOnService> getServices(String reservationId) {
+        return reservationServicesMap.getOrDefault(reservationId, new ArrayList<>());
+    }
 
-        void allocate(Reservation r, RoomInventory inventory) {
+    // Calculate total additional cost
+    public double calculateTotalServiceCost(String reservationId) {
+        double total = 0.0;
+        List<AddOnService> services = getServices(reservationId);
 
-            if (inventory.getAvailability(r.roomType) <= 0) {
-                System.out.println("No rooms available for " + r.roomType);
-                return;
-            }
+        for (AddOnService service : services) {
+            total += service.getCost();
+        }
+        return total;
+    }
 
-            String roomId;
-            do {
-                roomId = r.roomType.substring(0, 1).toUpperCase() + (100 + new Random().nextInt(900));
-            } while (usedRoomIds.contains(roomId));
+    // Display services
+    public void displayServices(String reservationId) {
+        List<AddOnService> services = getServices(reservationId);
 
-            usedRoomIds.add(roomId);
+        if (services.isEmpty()) {
+            System.out.println("No add-on services selected.");
+            return;
+        }
 
-            allocatedRooms.putIfAbsent(r.roomType, new HashSet<>());
-            allocatedRooms.get(r.roomType).add(roomId);
-
-            inventory.decrement(r.roomType);
-
-            System.out.println("Reservation Confirmed");
-            System.out.println("Guest: " + r.guestName);
-            System.out.println("Room Type: " + r.roomType);
-            System.out.println("Room ID: " + roomId);
-            System.out.println();
+        System.out.println("Add-On Services for Reservation " + reservationId + ":");
+        for (AddOnService service : services) {
+            System.out.println("- " + service);
         }
     }
+}
+
+// Main class to simulate the use case
+public class UseCase7AddOnServiceSelection {
 
     public static void main(String[] args) {
 
-        RoomInventory inventory = new RoomInventory();
-        BookingQueue queue = new BookingQueue();
-        RoomAllocationService service = new RoomAllocationService();
+        // Simulated reservation ID (already created in previous use cases)
+        String reservationId = "RES123";
 
-        queue.addRequest(new Reservation("Alice", "Single"));
-        queue.addRequest(new Reservation("Bob", "Double"));
-        queue.addRequest(new Reservation("Charlie", "Suite"));
+        // Initialize manager
+        AddOnServiceManager manager = new AddOnServiceManager();
 
-        while (queue.hasRequests()) {
-            Reservation r = queue.getNext();
-            service.allocate(r, inventory);
-        }
+        // Guest selects services
+        AddOnService breakfast = new AddOnService("Breakfast", 500);
+        AddOnService airportPickup = new AddOnService("Airport Pickup", 1200);
+        AddOnService spa = new AddOnService("Spa Access", 2000);
+
+        // Add services to reservation
+        manager.addService(reservationId, breakfast);
+        manager.addService(reservationId, airportPickup);
+        manager.addService(reservationId, spa);
+
+        // Display selected services
+        manager.displayServices(reservationId);
+
+        // Calculate total add-on cost
+        double totalCost = manager.calculateTotalServiceCost(reservationId);
+        System.out.println("Total Add-On Cost: ₹" + totalCost);
     }
 }
